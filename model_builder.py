@@ -6,6 +6,7 @@ from tensorflow.python.keras.optimizers import adam, RMSprop, SGD
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.regularizers import l2
 from tensorflow.python.keras.applications.vgg16 import VGG16
+from tensorflow.python.keras.applications.resnet50 import ResNet50
 from tensorflow.python.keras.initializers import *
 
 def _outer_product(x):
@@ -43,13 +44,14 @@ def _l2_normalize(x, axis=-1):
     '''
     return keras_backend.l2_normalize(x, axis=axis)
 
-def buil_bcnn(
+def build_bcnn(
         all_trainable=False,
 
         size_height=448,
         size_width=448,
         no_class=200,
         no_last_layer_backbone=17,
+        # no_last_layer_backbone=-1,
 
         name_optimizer='sgd',
         learning_rate=1.0,
@@ -91,11 +93,14 @@ def buil_bcnn(
         input_tensor=input_tensor,
         include_top=False,
         weights='imagenet')
+    # pre_train_model = ResNet50(
+    #     input_tensor=input_tensor,
+    #     include_top=False,
+    #     weights='imagenet')
 
     # Pre-trained weights
     for layer in pre_train_model.layers:
         layer.trainable = all_trainable
-
 
     ######################
     # Combine two models #
@@ -184,7 +189,7 @@ def save_model(
     Returns:
         Bilinear CNN model.
     '''
-    model = buil_bcnn(
+    model = build_bcnn(
         size_height=size_height,
         size_width=size_width,
         no_class=no_class)

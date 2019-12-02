@@ -64,4 +64,45 @@ def fine_tuning(
 
 
 if __name__ == "__main__":
-    pass
+
+    ROOT_PATH = '/home/speciallan/Documents/python/data/CUB_200_2011'
+    TRAIN_DIR = ROOT_PATH + '/splitted/train'
+    VALID_DIR = ROOT_PATH + '/splitted/valid'
+
+    # Start transfer learning
+    TENSORBOARD_DIR = './logs_tl'
+    CHECKPOINT_DIR = './checkpoints'
+
+    if not os.path.exists(TENSORBOARD_DIR):
+        os.makedirs(TENSORBOARD_DIR)
+    if not os.path.exists(CHECKPOINT_DIR):
+        os.makedirs(CHECKPOINT_DIR)
+
+    # Transfer the model to 4 classes, images and labels of
+    # each class should be well prepared in train and validataion directory.
+    transfer_learning(
+        TRAIN_DIR,
+        VALID_DIR,
+        no_class=4,
+        batch_size=64)
+
+    # Start fine-tuning
+    MODEL_WEIGHTS_PATH = './model_weights.h5'
+    TENSORBOARD_DIR = './logs_ft'
+    CHECKPOINT_DIR = './checkpoints'
+
+    if not os.path.exists(TENSORBOARD_DIR):
+        os.makedirs(TENSORBOARD_DIR)
+    if not os.path.exists(CHECKPOINT_DIR):
+        os.makedirs(CHECKPOINT_DIR)
+
+    # Load the generated weights from transer learning,
+    # then fine tune all layers.
+    fine_tuning(
+        TRAIN_DIR,
+        VALID_DIR,
+        model_weights_path=MODEL_WEIGHTS_PATH,
+        no_class=4,
+        batch_size=32,
+        tensorboard_dir=TENSORBOARD_DIR,
+        checkpoint_dir=CHECKPOINT_DIR)

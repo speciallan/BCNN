@@ -5,7 +5,7 @@ import os
 from tensorflow.python.keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from tensorflow.python.keras.backend import clear_session
 
-from model_builder import buil_bcnn
+from model_builder import build_bcnn
 from data_loader import build_generator
 
 clear_session()
@@ -47,7 +47,7 @@ def train_model(
         Training history.
     '''
 
-    model = buil_bcnn(
+    model = build_bcnn(
         all_trainable=all_trainable,
         no_class=no_class,
         name_optimizer=name_optimizer,

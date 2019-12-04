@@ -2,6 +2,8 @@
 # -*- coding:utf-8 -*-
 # Author:Speciallan
 
+import sys
+sys.path.append('../')
 import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
@@ -18,61 +20,78 @@ from keras.callbacks import EarlyStopping
 from keras.models import load_model
 from keras.utils import to_categorical
 from data_loader import build_generator, generator
+from BCNN.training.trainer import set_runtime_environment, get_callback
+from BCNN.models import model_zoo
 
+set_runtime_environment()
 
-K.set_image_dim_ordering('tf')
-
-WEIGHTS_PATH = 'vgg16_weights_tf_dim_ordering_tf_kernels.h5'
-WEIGHTS_PATH_NO_TOP = 'resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
-# img_width, img_height = 200,200
-# img_width, img_height = 224,224
+# 要修改
 img_width, img_height = 224,224
+img_width, img_height = 224,40
 num_classes = 3
 
-input_tensor = Input(shape=(img_width, img_height, 3)) # 当使用不包括top的VGG16时，要指定输入的shape，否则会报错
-model = ResNet50(include_top=False, weights=None, input_tensor=input_tensor)
-weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
-model.load_weights(weights_path, by_name=True)
-print('Model loaded.')
+input_tensor = Input(shape=(img_height, img_width, 3))
 
 
-x = model.output
-x = GlobalAvgPool2D(name='avg_pool')(x)
-x = Dense(num_classes, activation='softmax', name='fc')(x)
+# resnet50
+# model = model_zoo.snet(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50(shape=(img_height, img_width, 3))
+model = model_zoo.cbam(shape=(img_height, img_width, 3))
 
-model2 = Model(inputs=model.input, outputs=x)
-
-for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
+for layer in model.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
     layer.trainable = True
 
-model2.compile(loss='categorical_crossentropy',
-               optimizer = SGD(lr=1e-3,momentum=0.9),#SGD(lr=1e-3,momentum=0.9)
+# weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
+weights_path = './model/cloth_cbam.h5'
+model.load_weights(weights_path, by_name=True)
+
+model.compile(loss='categorical_crossentropy',
+               optimizer = SGD(lr=1e-4,momentum=0.9),
                metrics=['accuracy'])
 
 train_data_dir = '../../data/cloth/splitted/train'
+train_data_dir = '../../data/cloth/origin'
 validation_data_dir = '../../data/cloth/splitted/valid'
-#img_width, img_height = 128, 128
-nb_train_samples = 25712
+nb_train_samples = 65208
+# nb_train_samples = 25712
 nb_validation_samples = 6428
-epochs = 10
-total = 1000
-batch_size = 32
+# nb_validation_samples = 1000
+epochs = 100
+batch_size = 64
 classes = ['01', '02', '99']
+model_path = './model'
+model_name = 'cloth_cbam'
 
-train_generator = generator(train_data_dir, classes=classes, batch_size=batch_size, target_size=(img_height, img_width))
-# train_generator, valid_generator = build_generator(
-#     train_dir=train_data_dir,
-#     valid_dir=validation_data_dir,
-#     target_size=(img_height, img_width),
-#     batch_size=batch_size)
+train_generator, valid_generator = build_generator(
+    train_dir=train_data_dir,
+    valid_dir=validation_data_dir,
+    target_size=(img_height, img_width),
+    batch_size=batch_size)
 
 # (16, 224, 224, 3) , (16, 3)
 
-# t = next(train_generator)
-# print(t[0].shape, t[1].shape)
-# exit()
+model.fit_generator(
+    train_generator,
+    steps_per_epoch=nb_train_samples // batch_size,
+    epochs=epochs,
+    validation_data=valid_generator,
+    validation_steps=nb_validation_samples // batch_size,
+    callbacks=get_callback(model_path, model_name))
 
-path_model = './model/resnet50_'
+# model2.save_weights(model_path + '/' + model_name + '.h5')
+
+# -------------------------------------------------------------------
+exit()
+
+
+
+
+
+
+
+train_generator = generator(train_data_dir, classes=classes, batch_size=batch_size, target_size=(img_height, img_width))
+
+path_model = './model/resnet50'
 callack_saver = keras.callbacks.ModelCheckpoint(
                         path_model
                             + "e_{epoch:02d}"

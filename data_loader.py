@@ -8,7 +8,10 @@ import cv2
 import random
 import os
 
-def train_preprocessing(x, size_target=(224, 224)):
+# 要修改
+size_target = (40,224)
+
+def train_preprocessing(x):
     '''Preprocessing for train dataset image.
 
     Args:
@@ -39,7 +42,7 @@ def train_preprocessing(x, size_target=(224, 224)):
         mean=[123.82988033, 127.3509729, 110.25606303]
     )
 
-def valid_preprocessing(x, size_target=(224, 224)):
+def valid_preprocessing(x):
     '''Preprocessing for validation dataset image.
 
     Args:
@@ -160,6 +163,9 @@ def generator(dir, classes, batch_size=16, target_size=(256,256)):
 
             img = cv2.imread(filepath_list[idx])
             img_resized = cv2.resize(img, target_size)
+            # print(img.shape)
+            # print(img_resized.shape)
+            # exit()
             img_preprocessed = img_resized / 255.0
 
             imgs.append(img_preprocessed)

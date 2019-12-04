@@ -1,102 +1,37 @@
-# BCNN Keras Clean
 
-This repository is a clean version of BCNN (Bilinear CNN) implementation with keras.
-
-The notebook is totally translated to the structured codes, which would be much more convenient to run with cloud servers, such as AWS, in the background.
-
-Most of the codes are kept as same as the notebook, while some codes are modified for better structure. Also know that some training parameters are changed too.
-
-## Bilinear CNN
-
-Bilinear CNN [1] is simple yet powerful model for Fine-Grained Visual Classification task. Here, B-CNN D-D model is implemented with keras.
-
-![Bilinear-CNN architecture](http://vis-www.cs.umass.edu/bcnn/docs/teaser-bcnn.png)
-
-## Usages
-
-For practical usage, we just need to invoke two functions `transfer_learning()` and `fine_tuning()` from `main.py`. In most cases, we should first invoke `transfer_learning()` to transfer the model to our target classes, then invoke `fine_tuning()` to fine tune all the layers.
-
-Here's a demo, we try to train a 4-class BCNN model. At the beginning, ensure all the requirements are poperly installed in the environment.
-
-Firstly, the dataset should be prepared as follow.
-
-```
-./train
- |____ class1
- |____ class2
- |____ class3
- |____ class4
-
-./validation
- |____ class1
- |____ class2
- |____ class3
- |____ class4
-```
-
-After that, rewrite `main.py` or just import it.
-
-```python
-import os
-
-TRAIN_DIR = './train'
-VALID_DIR = './validation'
-
-# Start transfer learning
-TENSORBOARD_DIR = './logs_tl'
-CHECKPOINT_DIR = './checkpoints'
-
-if not os.path.exists(TENSORBOARD_DIR):
-    os.makedirs(TENSORBOARD_DIR)
-if not os.path.exists(CHECKPOINT_DIR):
-    os.makedirs(CHECKPOINT_DIR)
-
-# Transfer the model to 4 classes, images and labels of
-# each class should be well prepared in train and validataion directory.
-transfer_learning(
-    TRAIN_DIR,
-    VALID_DIR,
-    no_class=4,
-    batch_size=64)
+#1、数据
+数据尺寸：不形变，缩放不好，裁剪
+数据平衡：
 
 
-# Start fine-tuning
-MODEL_WEIGHTS_PATH = './model_weights.h5'
-TENSORBOARD_DIR = './logs_ft'
-CHECKPOINT_DIR = './checkpoints'
+#2、模型
+# baseline：resnet50
+(1)resnet浅层特征
+(2)注意力 空间，准备试试只用通道注意力
+(3)模型集成 
+(4)可变卷积
 
-if not os.path.exists(TENSORBOARD_DIR):
-    os.makedirs(TENSORBOARD_DIR)
-if not os.path.exists(CHECKPOINT_DIR):
-    os.makedirs(CHECKPOINT_DIR)
+#3、细粒度分类
 
-# Load the generated weights from transer learning,
-# then fine tune all layers.
-fine_tuning(
-    TRAIN_DIR,
-    VALID_DIR,
-    model_weights_path=MODEL_WEIGHTS_PATH,
-    no_class=4,
-    batch_size=32,
-    tensorboard_dir=TENSORBOARD_DIR,
-    checkpoint_dir=CHECKPOINT_DIR)
-```
+#4、分析错误样本
+可视化特征与激活图 grad-cam
 
-## Requirements
 
-- `tensorflow-gpu=1.10.0`: any version that match you GPU, or simply the latest version of `tensorflow` for CPU.
-- `numpy=1.14.5`: for scientific computing.
-- `opencv-python=4.0.0.21`: for image resizing.
-- `h5py=2.6.0`: for model weights saving.
+# 实验数据
 
-**NOTE**: Keras has its own methods for data augmentation, but the notebook has rewritten the preprocessing functions with center cropping and random cropping. Therefore, `OpenCV` is required in order to follow the source code. BTW, I haven't test whether the rewritten functions are necessary or not.
+| model | val_loss | val_acc | test(32130) | testA(3257) | testB(200) | testC(56) | description |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| resnet50(224x224 + train) | 0.176 | 0.939 | 0.936 | 0.863 | 0.705 | 0.893 | baseline |
+| resnet50b(block3 + train) | 0.495 | 0.858 | 0.853 | 0.202 | 0.304 | **0.964** | 偶然性 |
+| resnet50c(keep_size + train) | 0.108 | **0.996** | **0.955** | 0.884 | 0.580 | **0.964** | # |
+| resnet50d(ks + all) | 0.003 | **0.999** | **0.999** | 0.798 | 0.515 | **0.946** |
+| resnet20 | # | # | # | # | # | # |
+| assemble |
+| snet | # | # |
+| snetplus | # | # |
+| attention(se) | 0.834 | 0.817 | 0.817 | 0.557 | 0.36 | 0.393 |
+| attention(cbam) | 0.615 | 0.908 | 0.894 | 0.460 | 0.385 | 0.625 |
+| BCNN | 0.714 | 0.814 | 
+ 
+testA
 
-## Reference
-
-[1] Lin T Y, RoyChowdhury A, Maji S. Bilinear cnn models for fine-grained visual recognition[C]//Proceedings of the IEEE International Conference on Computer Vision. 2015: 1449-1457. [[pdf]](http://vis-www.cs.umass.edu/bcnn/docs/bcnn_iccv15.pdf)
-
-## Thanks
-
-Deeply thanks [BCNN_keras](https://github.com/tkhs3/BCNN_keras) by [tkhs3](https://github.com/tkhs3).
-
-**NOTE**: Click [README](./source/README.md) and [BCNN_keras](./source/BCNN_keras.ipynb) for details of the original souce codes.

@@ -18,6 +18,7 @@ from data_loader import build_generator
 from model_builder import build_bcnn
 
 img_width, img_height = 224,224
+img_width, img_height = 224,40
 num_classes = 3
 
 model = build_bcnn(
@@ -33,8 +34,8 @@ print('Model loaded.')
 
 test_data_dir = '../../data/cloth/splitted/test'
 total = 32130
-total = 10000
-batch_size = 128
+# total = 10000
+batch_size = 256
 classes = ['01', '02', '99']
 
 test_generator = build_generator(
@@ -48,6 +49,7 @@ test_generator = test_generator[0]
 # exit()
 
 tp = 0
+wrong = [0, 0, 0]
 total_iters = total // batch_size
 for i in range(total_iters):
     print('正在评估第 {}/{} 个循环'.format(i, total_iters))
@@ -67,6 +69,8 @@ for i in range(total_iters):
             tp += 1
         else:
             print('true:{}, wrong:{}, prob:{}'.format(test_labels[k], pred_labels[k], result[k]))
+            wrong[test_labels[k]] += 1
 
 print('total: {}, acc: {:.3f}'.format(total, tp*1.0/total))
+print('wrong: {}'.format(wrong))
 

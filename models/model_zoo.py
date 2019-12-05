@@ -39,13 +39,23 @@ def resnet50(shape=(img_height, img_width, img_channel)):
 
     return model2
 
+def resnet20_se(shape=(img_height, img_width, img_channel)):
+    depth = 20
+    attention_module = 'se_block'
+    model = resnet_v1(input_shape=shape, depth=depth, num_classes=num_classes, attention_module=attention_module)
+    return model
 
-def se(shape=(img_height, img_width, img_channel)):
+def resnet50_se(shape=(img_height, img_width, img_channel)):
     depth = 50
     attention_module = 'se_block'
     model = resnet_v1(input_shape=shape, depth=depth, num_classes=num_classes, attention_module=attention_module)
     return model
 
+def resnet101_se(shape=(img_height, img_width, img_channel)):
+    depth = 104
+    attention_module = 'se_block'
+    model = resnet_v1(input_shape=shape, depth=depth, num_classes=num_classes, attention_module=attention_module)
+    return model
 
 def cbam(shape=(img_height, img_width, img_channel)):
     depth = 50

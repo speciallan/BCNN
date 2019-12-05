@@ -11,6 +11,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense,Input
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications import VGG16, ResNet50, InceptionV3
+# from keras.applications.resnet import ResNet101
 from keras.layers import Convolution2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 import numpy as np
@@ -36,31 +37,38 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # resnet50
 # model = model_zoo.snet(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet50(shape=(img_height, img_width, 3))
-model = model_zoo.cbam(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet101(shape=(img_height, img_width, 3))
+# model = model_zoo.cbam(shape=(img_height, img_width, 3))
+model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 
-for layer in model.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
-    layer.trainable = True
+# for layer in model.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
+#     layer.trainable = True
 
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
-weights_path = './model/cloth_cbam.h5'
-model.load_weights(weights_path, by_name=True)
+# weights_path = './model/cloth_resnet20_se.h5'
+# model.load_weights(weights_path, by_name=True)
 
 model.compile(loss='categorical_crossentropy',
-               optimizer = SGD(lr=1e-4,momentum=0.9),
+               optimizer = SGD(lr=1e-3,momentum=0.9),
                metrics=['accuracy'])
 
 train_data_dir = '../../data/cloth/splitted/train'
-train_data_dir = '../../data/cloth/origin'
+# train_data_dir = '../../data/cloth/origin'
 validation_data_dir = '../../data/cloth/splitted/valid'
-nb_train_samples = 65208
-# nb_train_samples = 25712
+validation_data_dir = '../../data/cloth/test/test_a'
+# nb_train_samples = 65208
+nb_train_samples = 25712
+# nb_train_samples = 5712
 nb_validation_samples = 6428
+nb_validation_samples = 3257
 # nb_validation_samples = 1000
 epochs = 100
-batch_size = 64
+batch_size = 32 # resnet50 64
 classes = ['01', '02', '99']
 model_path = './model'
-model_name = 'cloth_cbam'
+model_name = 'cloth_resnet20_se'
 
 train_generator, valid_generator = build_generator(
     train_dir=train_data_dir,

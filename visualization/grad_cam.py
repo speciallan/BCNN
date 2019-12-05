@@ -12,7 +12,7 @@ from keras.preprocessing.image import load_img, img_to_array
 
 K.set_learning_phase(1)  # set learning phase
 
-def draw(model, num_classes, shape, img_path, save_path):
+def draw(model, model_name, last_layer_name, num_classes, shape, img_path, save_path):
 
     img_height, img_width, _ = shape
 
@@ -34,8 +34,8 @@ def draw(model, num_classes, shape, img_path, save_path):
     class_output = model.output[:, class_idx]
 
     # block5
-    # last_conv_layer = model.get_layer("activation_49")
-    last_conv_layer = model.get_layer("activation_73") # cbam
+    last_conv_layer = model.get_layer(last_layer_name)
+    total_channels = last_conv_layer.output.shape[-1]
 
     # print(len(K.gradients(class_output, last_conv_layer.output)))
     grads = K.gradients(class_output, last_conv_layer.output)[0]
@@ -44,7 +44,7 @@ def draw(model, num_classes, shape, img_path, save_path):
 
     pooled_grads_value, conv_layer_output_value = iterate([x])
     # 512
-    for i in range(64):
+    for i in range(total_channels):
         conv_layer_output_value[:, :, i] *= pooled_grads_value[i]
 
     heatmap = np.mean(conv_layer_output_value, axis=-1)
@@ -64,7 +64,7 @@ def draw(model, num_classes, shape, img_path, save_path):
     superimposed_img = img.copy()
     superimposed_img = cv2.addWeighted(img, 0.6, heatmap, 0.4, 0, superimposed_img, img.shape[2])
 
-    cv2.imwrite(save_path, superimposed_img)
+    cv2.imwrite(save_path.replace('.jpg', '_{}.jpg'.format(model_name)), superimposed_img)
     # cv2.imwrite(save_path.replace('.jpg', '_{}.jpg'.format(class_idx)), superimposed_img)
     # cv2.imshow('Grad-cam', superimposed_img)
     # cv2.waitKey(0)

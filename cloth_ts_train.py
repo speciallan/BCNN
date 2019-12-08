@@ -29,23 +29,22 @@ set_runtime_environment()
 # 要修改
 img_width, img_height = 224,224
 img_width, img_height = 224,40
-num_classes = 3
+num_classes = 2
 
 input_tensor = Input(shape=(img_height, img_width, 3))
-
 
 # resnet50
 # model = model_zoo.snet(shape=(img_height, img_width, 3))
 # model = model_zoo.inception_resnet_v2(shape=(img_height, img_width, 3))
-# model = model_zoo.resnet50(shape=(img_height, img_width, 3))
-model = model_zoo.resnet101(shape=(img_height, img_width, 3))
-# model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_classes)
+# model = model_zoo.resnet50_se(shape=(img_height, img_width, 3), num_classes=num_classes)
+# model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
-# model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
+model = model_zoo.resnet101_se(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
@@ -53,38 +52,31 @@ model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
-weights_path = './model/cloth_resnet101_fl.h5'
-model.load_weights(weights_path, by_name=True)
+# weights_path = './model/cloth_resnet50_se.h5'
+# weights_path = './model/cloth_ts_resnet50_2.h5'
+# model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
 # exit()
-
-# model.compile(loss='categorical_crossentropy',
-#                optimizer = SGD(lr=1e-3,momentum=0.9),
-#                metrics=['accuracy'])
-# sample_nums = [7200, 7600, 11000]
-# sample_nums = [18000, 19000, 28230]
 
 model.compile(loss=focal_loss(),
               optimizer=SGD(lr=1e-3,momentum=0.9),
               metrics=['accuracy']
               )
 
-train_data_dir = '../../data/cloth/splitted/train'
-# train_data_dir = '../../data/cloth/origin'
-# validation_data_dir = '../../data/cloth/splitted/valid'
-# test a+b+c
-validation_data_dir = '../../data/cloth/test/test'
-# nb_train_samples = 65208
-nb_train_samples = 25712
+train_data_dir = '../../data/cloth/splitted/train_1'
+train_data_dir = '../../data/cloth/train_2'
+validation_data_dir = '../../data/cloth/test/test_2'
+nb_train_samples = 65208
+# nb_train_samples = 25712
 # nb_train_samples = 5712
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257
-nb_validation_samples = 3437
-# nb_validation_samples = 1000
+nb_validation_samples = 2527 #1
+nb_validation_samples = 1035 #2
 epochs = 200
 batch_size = 128 # resnet50#64 101#128 152#48
-classes = ['01', '02', '99']
+classes = ['02', '99']
 model_path = './model'
 model_name = 'cloth_resnet50_se'
 
@@ -105,7 +97,7 @@ model.fit_generator(
     epochs=epochs,
     validation_data=valid_generator,
     validation_steps=nb_validation_samples // batch_size,
-    callbacks=get_callback(model_path, model_name, period=3))
+    callbacks=get_callback(model_path, model_name, period=1))
 
 # model2.save_weights(model_path + '/' + model_name + '.h5')
 

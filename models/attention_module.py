@@ -12,7 +12,7 @@ def attach_attention_module(net, attention_module):
 
   return net
 
-def se_block(input_feature, ratio=1):
+def se_block(input_feature, ratio=16):
 	"""Contains the implementation of Squeeze-and-Excitation(SE) block.
 	As described in https://arxiv.org/abs/1709.01507.
 	"""
@@ -41,7 +41,7 @@ def se_block(input_feature, ratio=1):
 	se_feature = multiply([input_feature, se_feature])
 	return se_feature
 
-def cbam_block(cbam_feature, ratio=1):
+def cbam_block(cbam_feature, ratio=8):
 	"""Contains the implementation of Convolutional Block Attention Module(CBAM) block.
 	As described in https://arxiv.org/abs/1807.06521.
 	"""
@@ -50,7 +50,7 @@ def cbam_block(cbam_feature, ratio=1):
 	cbam_feature = spatial_attention(cbam_feature)
 	return cbam_feature
 
-def channel_attention(input_feature, ratio=1):
+def channel_attention(input_feature, ratio=8):
 	
 	channel_axis = 1 if K.image_data_format() == "channels_first" else -1
 	channel = input_feature._keras_shape[channel_axis]

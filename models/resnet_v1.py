@@ -9,7 +9,7 @@ https://arxiv.org/pdf/1512.03385.pdf
 from __future__ import print_function
 import keras
 from keras.layers import Dense, Conv2D, BatchNormalization, Activation
-from keras.layers import AveragePooling2D, Input, Flatten
+from keras.layers import AveragePooling2D, Input, Flatten, MaxPooling2D, GlobalAvgPool2D
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras.callbacks import ReduceLROnPlateau
@@ -95,14 +95,24 @@ def resnet_v1(input_shape, depth, num_classes=10, attention_module=None):
     if (depth - 2) % 6 != 0:
         raise ValueError('depth should be 6n+2 (eg 20, 32, 44 in [a])')
     # Start model definition.
-    num_filters = 16
+    num_filters = 64
     num_res_blocks = int((depth - 2) / 6)
 
     inputs = Input(shape=input_shape)
-    x = resnet_layer(inputs=inputs)
+    x = resnet_layer(inputs=inputs, kernel_size=7, num_filters=num_filters, strides=2)
     # Instantiate the stack of residual units
-    for stack in range(3):
+
+    x = MaxPooling2D(pool_size=(3,3), strides=2)(x)
+
+    # 感受野 下采样8倍 224/8=28  /4 = 7
+    down_sampling_nums = 4
+
+    for stack in range(down_sampling_nums-1):
         for res_block in range(num_res_blocks):
+            # 不要第一个block
+            if stack == 0:
+                continue
+
             strides = 1
             if stack > 0 and res_block == 0:  # first layer but not first stack
                 strides = 2  # downsample
@@ -110,28 +120,33 @@ def resnet_v1(input_shape, depth, num_classes=10, attention_module=None):
                              num_filters=num_filters,
                              strides=strides)
             y = resnet_layer(inputs=y,
-                             num_filters=num_filters,
+                             num_filters=num_filters*4,
                              activation=None)
             if stack > 0 and res_block == 0:  # first layer but not first stack
                 # linear projection residual shortcut connection to match
                 # changed dims
                 x = resnet_layer(inputs=x,
-                                 num_filters=num_filters,
+                                 num_filters=num_filters*4,
                                  kernel_size=1,
                                  strides=strides,
                                  activation=None,
                                  batch_normalization=False)
+            # print(x, y)
+            # exit()
             # attention_module
             if attention_module is not None:
                 y = attach_attention_module(y, attention_module)
             x = keras.layers.add([x, y])
             x = Activation('relu')(x)
+
+        # 超参数 确定特征维度 下采样一次通道数加倍
         num_filters *= 2
 
     # Add classifier on top.
     # v1 does not use BN after last shortcut connection-ReLU
-    x = AveragePooling2D(pool_size=8)(x)
-    y = Flatten()(x)
+    # x = AveragePooling2D(pool_size=(2,7))(x)
+    # y = Flatten()(x)
+    y = GlobalAvgPool2D()(x)
     outputs = Dense(num_classes,
                     activation='softmax',
                     kernel_initializer='he_normal')(y)

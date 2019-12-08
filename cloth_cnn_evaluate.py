@@ -14,6 +14,7 @@ from keras.applications import VGG16, ResNet50, InceptionV3
 from keras.layers import Convolution2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 import numpy as np
+import math
 from keras import backend as K
 from keras.models import Model
 from data_loader import build_generator, generator
@@ -23,69 +24,80 @@ img_width, img_height = 224,224
 img_width, img_height = 224,40
 
 # model = model_zoo.resnet50(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50_se1(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
-model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
+model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
 
-weights_path = './model/cloth_resnet50_se.h5'
+weights_path = './model/cloth_resnet101_se.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
 test_data_dir = '../../data/cloth/splitted/test'
-# abc 0.867 0.705 0.893
-# 123 0.896 0.834 0.865
-test_data_dir = '../../data/cloth/test/test_b'
+test_data_dir = '../../data/cloth/test/'
 # total = 32130
-# total = 3257
-total = 200
+total = 3257
+# total = 200
 # total = 56
-# batch_size = 512
-batch_size = 16
+# total = 3437
+batch_size = 512
+# batch_size = 16
 classes = ['01', '02', '99']
+test_name_arr = ['test_a', 'test_b', 'test_c']
+test_total_arr = [3257, 200, 56]
+test_batch_arr = [512, 200, 56]
 
 # -------------------------------------------------------------------
 
-test_generator = build_generator(
-    train_dir=test_data_dir,
-    target_size=(img_height, img_width),
-    batch_size=batch_size)
+for idx, name in enumerate(test_name_arr):
 
-test_generator = test_generator[0]
-# t = next(test_generator)
-# print(t[0].shape, t[1].shape)
-# exit()
+    test_data_dir_1 = test_data_dir + name
+    total = test_total_arr[idx]
+    batch_size = test_batch_arr[idx]
 
-sum = 0
-tp = 0
-wrong = [0, 0, 0]
-total_iters = total // batch_size + 1
-for i in range(total_iters):
-    print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
-    data = next(test_generator)
-    test_imgs = data[0]
-    true_labels = data[1]
+    test_generator = build_generator(
+        train_dir=None,
+        valid_dir=test_data_dir_1,
+        target_size=(img_height, img_width),
+        batch_size=batch_size)
 
-    # result = model.predict(test_imgs, batch_size=batch_size, verbose=0)
-    result = model.predict_on_batch(test_imgs)
+    test_generator = test_generator[0]
+    # t = next(test_generator)
+    # print(t[0].shape, t[1].shape, t[0][0])
+    # exit()
 
-    # 输出
-    true_labels = np.argmax(true_labels, axis=-1)
-    pred_labels = np.argmax(result, axis=-1)
+    sum = 0
+    tp = 0
+    wrong = [0, 0, 0]
+    total_iters = int(math.ceil(total*1.0 / batch_size))
+    for i in range(total_iters):
+        # print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
+        data = next(test_generator)
+        test_imgs = data[0]
+        true_labels = data[1]
 
-    sum += len(true_labels)
+        result = model.predict_on_batch(test_imgs)
 
-    # 评估
-    for k,v in enumerate(true_labels):
-        if true_labels[k] == pred_labels[k]:
-            tp += 1
-        else:
-            print('true:{}, wrong:{}, prob:{}'.format(true_labels[k], pred_labels[k], result[k]))
-            wrong[true_labels[k]] += 1
+        # 输出
+        true_labels = np.argmax(true_labels, axis=-1)
+        pred_labels = np.argmax(result, axis=-1)
 
-print('total: {}, acc: {:.3f}'.format(sum, tp*1.0/sum))
-print('wrong: {}'.format(wrong))
+        sum += len(true_labels)
+
+        # 评估
+        for k,v in enumerate(true_labels):
+            if true_labels[k] == pred_labels[k]:
+                tp += 1
+            else:
+                # print('true:{}, wrong:{}, prob:{}'.format(true_labels[k], pred_labels[k], result[k]))
+                wrong[true_labels[k]] += 1
+
+    print('total: {}, acc: {:.3f}'.format(sum, tp*1.0/sum))
+    # print('wrong: {}'.format(wrong))
 
 exit()
 # -------------------------------------------------------------------
@@ -113,6 +125,7 @@ for i in range(total_iters):
 
     # 评估
     for k,v in enumerate(true_labels):
+        # print(true_labels[k], pred_labels[k])
         if true_labels[k] == pred_labels[k]:
             tp += 1
         else:

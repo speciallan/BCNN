@@ -22,27 +22,32 @@ from BCNN.visualization.grad_cam import draw
 
 img_width, img_height = 224,40
 
-# model = model_zoo.resnet50(shape=(img_height, img_width, 3))
+model = model_zoo.resnet50(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
-model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
 
 # model.summary()
 # exit()
-# model_name = 'resnet50'
-# last_layer_name = 'activation_49' # resnet
+model_name = 'resnet50'
+last_layer_name = 'activation_49' # resnet
+# model_name = 'resnet50_se'
+# last_layer_name = 'activation_50' # resnet50_se
+# last_layer_name = 'activation_51' # resnet50_cbam
+
 # model_name = 'cbam'
 # last_layer_name = 'activation_73' # cbam
-model_name = 'resnet50_se'
-last_layer_name = 'activation_49' # se
+# model_name = 'resnet101_se'
+# last_layer_name = 'activation_49' # se
 # model_name = 'resnet101_se'
 # last_layer_name = 'activation_103' # se
 
-# weights_path = './model/cloth_resnet50.h5'
+weights_path = './model/cloth.h5'
 # weights_path = './model/cloth_cbam.h5'
-weights_path = './model/cloth_resnet50_se.h5'
+# weights_path = './model/cloth_resnet101_se.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
@@ -80,8 +85,7 @@ for i in range(total_iters):
         print('true:{}, pred:{}, prob:{}, filepath:{}'.format(true_labels[k], pred_labels[k], result[k], filepaths[k]))
 
         # 输出cam
-
-        draw(model, model_name, last_layer_name, len(classes), (img_height, img_width, 3), single_path, single_path.replace('mytest', 'mytest_show'))
+        draw(model, model_name, last_layer_name, len(classes), (img_height, img_width, 3), filepaths[k], filepaths[k].replace('mytest', 'mytest_show'))
 
         if true_labels[k] == pred_labels[k]:
             tp += 1

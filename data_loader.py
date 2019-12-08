@@ -21,12 +21,11 @@ def train_preprocessing(x):
     Returns:
         Preprocessed image.
     '''
-    return horizontal_flip_image(
-            resize_image(
-                x,
-                size_target=size_target,
-                flg_keep_aspect=True
-            )
+
+    return resize_image(
+        x,
+        size_target=size_target,
+        flg_keep_aspect=True
     )
 
     return normalize_image(
@@ -53,9 +52,9 @@ def valid_preprocessing(x):
         Preprocessed image.
     '''
     return resize_image(
-            x,
-            size_target=size_target,
-            flg_keep_aspect=True
+        x,
+        size_target=size_target,
+        flg_keep_aspect=True
     )
 
     return normalize_image(
@@ -88,8 +87,14 @@ def build_generator(
     results = []
     if train_dir:
         train_datagen = ImageDataGenerator(
-            rescale=1./255,
-            preprocessing_function=train_preprocessing
+            # rescale=1./255,
+            # preprocessing_function=train_preprocessing,
+            samplewise_center=True,
+            samplewise_std_normalization=True,
+            rotation_range=20,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            horizontal_flip=True
         )
         train_generator = train_datagen.flow_from_directory(
             train_dir,
@@ -101,8 +106,10 @@ def build_generator(
 
     if valid_dir:
         valid_datagen = ImageDataGenerator(
-            rescale=1./255,
-            preprocessing_function=valid_preprocessing
+            # rescale=1./255,
+            # preprocessing_function=valid_preprocessing,
+            samplewise_center=True,
+            samplewise_std_normalization=True,
         )
         valid_generator = valid_datagen.flow_from_directory(
             valid_dir,
@@ -166,7 +173,9 @@ def generator(dir, classes, batch_size=16, target_size=(256,256)):
             # print(img.shape)
             # print(img_resized.shape)
             # exit()
-            img_preprocessed = img_resized / 255.0
+            mean = np.mean(img_resized, axis=0)
+            std = np.std(img_resized, axis=0)
+            img_preprocessed = (img_resized - mean) / std
 
             imgs.append(img_preprocessed)
             labels.append(label_list[idx])

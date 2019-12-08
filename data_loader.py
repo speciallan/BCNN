@@ -173,6 +173,7 @@ def generator(dir, classes, batch_size=16, target_size=(256,256)):
             # print(img.shape)
             # print(img_resized.shape)
             # exit()
+            # img_preprocessed = img_resized / 255.0
             mean = np.mean(img_resized, axis=0)
             std = np.std(img_resized, axis=0)
             img_preprocessed = (img_resized - mean) / std

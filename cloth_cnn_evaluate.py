@@ -23,18 +23,19 @@ from BCNN.models import model_zoo
 img_width, img_height = 224,224
 img_width, img_height = 224,40
 
-# model = model_zoo.resnet50(shape=(img_height, img_width, 3))
+model = model_zoo.resnet50(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet50_se1(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
-model = model_zoo.resnet101(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
 
-weights_path = './model/cloth_resnet101_fl.h5'
+# weights_path = './model/cloth_resnet101_fl.h5'
+weights_path = './model/cloth_resnet50c.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
@@ -43,7 +44,7 @@ test_data_dir = '../../data/cloth/test/'
 # total = 32130
 total = 3257
 # total = 200
-# total = 56
+total = 56
 # total = 3437
 batch_size = 512
 # batch_size = 16

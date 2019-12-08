@@ -36,7 +36,7 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # resnet50
 # model = model_zoo.snet(shape=(img_height, img_width, 3))
 # model = model_zoo.inception_resnet_v2(shape=(img_height, img_width, 3))
-# model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_classes)
+model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet50_se(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
@@ -44,7 +44,7 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
-model = model_zoo.resnet101_se(shape=(img_height, img_width, 3), num_classes=num_classes)
+# model = model_zoo.resnet101_se(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
@@ -53,8 +53,8 @@ model = model_zoo.resnet101_se(shape=(img_height, img_width, 3), num_classes=num
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
 # weights_path = './model/cloth_resnet50_se.h5'
-# weights_path = './model/cloth_ts_resnet50_2.h5'
-# model.load_weights(weights_path, by_name=True, skip_mismatch=True)
+weights_path = './model/cloth_resnet50c.h5'
+model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
 # exit()
@@ -64,11 +64,11 @@ model.compile(loss=focal_loss(),
               metrics=['accuracy']
               )
 
-train_data_dir = '../../data/cloth/splitted/train_1'
-train_data_dir = '../../data/cloth/train_2'
+train_data_dir = '../../data/cloth/splitted/train_2'
+# train_data_dir = '../../data/cloth/train_2'
 validation_data_dir = '../../data/cloth/test/test_2'
-nb_train_samples = 65208
-# nb_train_samples = 25712
+# nb_train_samples = 65208
+nb_train_samples = 25712
 # nb_train_samples = 5712
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257

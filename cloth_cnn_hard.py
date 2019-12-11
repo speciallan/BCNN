@@ -21,19 +21,23 @@ from BCNN.models import model_zoo
 from BCNN.visualization.grad_cam import draw
 
 img_width, img_height = 224,40
+img_width, img_height = 320,80
 
-model = model_zoo.resnet50(shape=(img_height, img_width, 3))
+# model = model_zoo.resnet50(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet50_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
+model = model_zoo.xception(shape=(img_height, img_width, 3))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
 
-# model.summary()
+model.summary()
 # exit()
-model_name = 'resnet50'
-last_layer_name = 'activation_49' # resnet
+model_name = 'xception'
+last_layer_name = 'block14_sepconv2_act' # resnet
+# model_name = 'resnet50'
+# last_layer_name = 'activation_49' # resnet
 # model_name = 'resnet50_se'
 # last_layer_name = 'activation_50' # resnet50_se
 # last_layer_name = 'activation_51' # resnet50_cbam
@@ -45,6 +49,7 @@ last_layer_name = 'activation_49' # resnet
 # model_name = 'resnet101_se'
 # last_layer_name = 'activation_103' # se
 
+weights_path = './model/cloth_xception.h5'
 weights_path = './model/cloth.h5'
 # weights_path = './model/cloth_cbam.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
@@ -59,6 +64,14 @@ batch_size = 1
 classes = ['01', '02', '99']
 
 test_generator = generator(test_data_dir, classes=classes, batch_size=batch_size, target_size=(img_width, img_height))
+
+# test_generator = build_generator(
+#     train_dir=None,
+#     valid_dir=test_data_dir,
+#     target_size=(img_height, img_width),
+#     batch_size=batch_size)
+#
+# test_generator = test_generator[0]
 
 tp = 0
 wrong = [0, 0, 0]

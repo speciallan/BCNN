@@ -29,6 +29,7 @@ set_runtime_environment()
 # 要修改
 img_width, img_height = 224,224
 img_width, img_height = 224,40
+img_width, img_height = 320,80
 num_classes = 2
 
 input_tensor = Input(shape=(img_height, img_width, 3))
@@ -36,7 +37,8 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # resnet50
 # model = model_zoo.snet(shape=(img_height, img_width, 3))
 # model = model_zoo.inception_resnet_v2(shape=(img_height, img_width, 3))
-model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_classes)
+# model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_classes)
+model = model_zoo.xception(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet50_se(shape=(img_height, img_width, 3), num_classes=num_classes)
 # model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.cbam(shape=(img_height, img_width, 3))
@@ -53,14 +55,15 @@ model = model_zoo.resnet50(shape=(img_height, img_width, 3), num_classes=num_cla
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
 # weights_path = './model/cloth_resnet50_se.h5'
-weights_path = './model/cloth_resnet50c.h5'
-model.load_weights(weights_path, by_name=True, skip_mismatch=True)
+# weights_path = './model/cloth_resnet50c.h5'
+# model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
 # exit()
+lr = 1e-5 #x
 
 model.compile(loss=focal_loss(),
-              optimizer=SGD(lr=1e-3,momentum=0.9),
+              optimizer=SGD(lr=lr,momentum=0.9),
               metrics=['accuracy']
               )
 
@@ -75,7 +78,7 @@ nb_train_samples = 25712
 nb_validation_samples = 2527 #1
 nb_validation_samples = 1035 #2
 epochs = 200
-batch_size = 128 # resnet50#64 101#128 152#48
+batch_size = 32 # resnet50#64 101#128 152#48
 classes = ['02', '99']
 model_path = './model'
 model_name = 'cloth_resnet50_se'

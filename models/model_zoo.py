@@ -6,7 +6,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense,Input, Add
 from keras.models import Model
-from keras.applications import VGG16, ResNet50, InceptionV3
+from keras.applications import VGG16, ResNet50, Xception
 import keras_resnet
 from keras_resnet.models import ResNet101
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
@@ -19,6 +19,9 @@ from keras.layers import *
 from keras import Model, layers, backend
 # from keras.applications import imagenet_utils
 # from keras.applications.imagenet_utils import imagenet_utils
+
+from BCNN.models.efficientnet.efficientnet import EfficientNetB4, EfficientNetB5
+from BCNN.models.efficientnet.custom_objects import EfficientNetDenseInitializer
 
 img_width = 224
 img_height = 224
@@ -66,10 +69,10 @@ def resnet101(shape=(img_height, img_width, img_channel)):
 
     return model2
 
-def inception_resnet_v2(shape=(img_height, img_width, img_channel)):
+def inception_resnet(shape=(img_height, img_width, img_channel)):
 
     input_tensor = Input(shape=shape)
-    model = InceptionResNetV2(include_top=False, weights=None, input_tensor=input_tensor)
+    model = InceptionResNetV2(include_top=False, weights='imagenet', input_tensor=input_tensor)
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)
@@ -77,6 +80,31 @@ def inception_resnet_v2(shape=(img_height, img_width, img_channel)):
 
     model2 = Model(inputs=model.input, outputs=x)
 
+    return model2
+
+def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes):
+
+    input_tensor = Input(shape=shape)
+    model = Xception(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    x = model.output
+    x = GlobalAvgPool2D(name='avg_pool')(x)
+    x = Dense(num_classes, activation='softmax', name='fc')(x)
+
+    model2 = Model(inputs=model.input, outputs=x)
+
+    return model2
+
+def efficientnet_b4(shape=(img_height, img_width, img_channel), num_classes=num_classes):
+
+    input_tensor = Input(shape=shape)
+    model = EfficientNetB4(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    x = model.output
+    x = GlobalAvgPool2D(name='avg_pool')(x)
+    x = layers.Dense(num_classes, kernel_initializer=EfficientNetDenseInitializer())(x)
+
+    model2 = Model(inputs=model.input, outputs=x)
     return model2
 
 def resnet50_se(shape=(img_height, img_width, img_channel), num_classes=num_classes):

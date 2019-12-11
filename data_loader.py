@@ -88,9 +88,9 @@ def build_generator(
     if train_dir:
         train_datagen = ImageDataGenerator(
             # rescale=1./255,
-            # preprocessing_function=train_preprocessing,
             samplewise_center=True,
             samplewise_std_normalization=True,
+            # preprocessing_function=train_preprocessing,
             rotation_range=20,
             width_shift_range=0.2,
             height_shift_range=0.2,
@@ -107,9 +107,9 @@ def build_generator(
     if valid_dir:
         valid_datagen = ImageDataGenerator(
             # rescale=1./255,
-            # preprocessing_function=valid_preprocessing,
             samplewise_center=True,
             samplewise_std_normalization=True,
+            # preprocessing_function=valid_preprocessing,
         )
         valid_generator = valid_datagen.flow_from_directory(
             valid_dir,

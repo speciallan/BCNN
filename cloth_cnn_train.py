@@ -26,10 +26,12 @@ from BCNN.network.loss import focal_loss
 
 set_runtime_environment()
 
-# 要修改
+# 要修改 avg w:499.77134756504336
+# avg h:77.1314209472982
+# avg r:6.703198380416794 imagenet-pre 224,224
 img_width, img_height = 224,224
 img_width, img_height = 320,80
-img_width, img_height = 480,80
+# img_width, img_height = 480,80
 num_classes = 3
 
 input_tensor = Input(shape=(img_height, img_width, 3))
@@ -48,8 +50,8 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
-model = model_zoo.inception_resnet(shape=(img_height, img_width, 3))
-# model = model_zoo.xception(shape=(img_height, img_width, 3))
+# model = model_zoo.inception_resnet(shape=(img_height, img_width, 3))
+model = model_zoo.xception(shape=(img_height, img_width, 3))
 # model = model_zoo.efficientnet_b4(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:-19]:
@@ -59,8 +61,8 @@ model = model_zoo.inception_resnet(shape=(img_height, img_width, 3))
 
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
-# weights_path = './model/cloth_xception.h5'
-weights_path = './model/cloth.h5'
+weights_path = './model/cloth_xception.h5'
+# weights_path = './model/cloth.h5'
 model.load_weights(weights_path, by_name=True)
 
 model.summary()
@@ -73,8 +75,8 @@ model.summary()
 # sample_nums = [18000, 19000, 28230]
 
 # lr = 1e-3
-lr = 0.001 #ir
-# lr = 1e-6 #x
+# lr = 0.001 #ir
+lr = 1e-6 #x
 # lr = 0.256 #b
 model.compile(loss=focal_loss(),
               optimizer=SGD(lr=lr, momentum=0.9),
@@ -82,18 +84,18 @@ model.compile(loss=focal_loss(),
               )
 
 train_data_dir = '../../data/cloth/splitted/train'
-# train_data_dir = '../../data/cloth/origin'
+train_data_dir = '../../data/cloth/origin'
 # validation_data_dir = '../../data/cloth/splitted/valid'
 # test a+b+c
 validation_data_dir = '../../data/cloth/test/test'
-# nb_train_samples = 65208
-nb_train_samples = 25712
+nb_train_samples = 65208
+# nb_train_samples = 25712
 # nb_train_samples = 5712
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257
 nb_validation_samples = 3437
 # nb_validation_samples = 1000
-epochs = 200
+epochs = 50
 batch_size = 32 # resnet50#64 101#128 152#48
 classes = ['01', '02', '99']
 model_path = './model'

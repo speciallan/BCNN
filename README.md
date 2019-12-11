@@ -46,8 +46,11 @@ baseline：resnet50
 | resnet101(ks+se+train) | 1.086 | 0.836 | 0.920 | **0.830** | **0.840** | 0.500 | 增大模型容量 |
 | resnet101(ks+all+fl+aug) | 0.023 | 0.910 | # | 0.928 | 0.685 | 0.589 | 能提高1个点 |
 | inception_resnet(ks+train+fl+aug+320,80) | 0.007 | 0.988 | # | 0.971 | 0.750 | 0.929 | testA提高 |
+| inception_resnet(ks+train+fl+aug+480,80) | 0.007 | 0.988 | # | 0.971 | 0.750 | 0.929 | testA提高 |
+| xception(ks+train+fl+aug+240,40) | 0.037 | **0.863** | # | **0.876** | 0.670 | **0.911** | testA提高 |
 | xception(ks+train+fl+aug+320,80) | 0.013 | **0.984** | # | **0.971** | 0.745 | **0.946** | testA提高 |
 | xception(ks+train+fl+aug+400,80) | 0.014 | 0.947 | # | 0.961 | 0.745 | 0.839 | # |
+| xception(ks+train+fl+aug+480,80) | 0.018 | 0.938 | # | 0.951 | 0.730 | 0.768 | # |
 | snet | # | # |
 | snetplus | # | # |
 | BCNN | 0.714 | 0.814 | 

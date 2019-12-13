@@ -54,6 +54,7 @@ baseline：resnet50
 | snet | # | # |
 | snetplus | # | # |
 | BCNN | 0.714 | 0.814 | 
+| inception_resnet(ks+train+fl+aug+320,80+gray) | 0.031 | 0.874 | # | 0.894 | 0.660 | 0.589 | # |
 
 二分类
 

@@ -42,18 +42,19 @@ def get_callback(model_path, model_name, log_path='./logs', period=3):
                                  period=period)                                           # checkpoint间隔的epoch数量
 
     # 验证误差没有提升
-    lr_reducer = ReduceLROnPlateau(monitor='val_acc', # 监视值
+    lr_reducer = ReduceLROnPlateau(monitor='val_loss', # 监视值
                                    factor=0.1,     # 减少学习率的因子，学习率将以lr = lr*factor的形式被减少
                                    cooldown=0,     # 学习率减少后，会经过cooldown个epoch才重新进行检查
-                                   patience=5,     # 经过patience个epoch后，如果检测值没变化，则出发学习率减少
+                                   patience=2,     # 经过patience个epoch后，如果检测值没变化，则出发学习率减少
                                    min_lr=1e-6,
-                                   mode='max')    # 最小学习率
+                                   verbose=1,
+                                   mode='auto')    # 最小学习率
 
     # 能够收敛，这里没使用早停
     early_stopping = EarlyStopping(monitor='val_loss', # 监视值
                                    patience=0,     # 早停出发后，经过patience个epoch停止训练
                                    verbose=1,      # 展示信息
-                                   mode='min')    # auto,min,max 当监测值不再减小/增加后触发早停
+                                   mode='auto')    # auto,min,max 当监测值不再减小/增加后触发早停
 
     # 保存训练日志
     logs = TensorBoard(log_dir=log_path)    # 日志保存路径，这里的值来自experiments里面的config.ini

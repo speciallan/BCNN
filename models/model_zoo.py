@@ -6,11 +6,12 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense,Input, Add
 from keras.models import Model
-from keras.applications import VGG16, ResNet50, Xception
+from keras.applications import VGG16, ResNet50
 import keras_resnet
 from keras_resnet.models import ResNet101
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from BCNN.models.resnet_v1 import resnet_v1
+from BCNN.models.xception import Xception
 from BCNN.models.attention_module import attach_attention_module
 from taurus_cv.models.resnet.snet import snettz
 
@@ -72,7 +73,10 @@ def resnet101(shape=(img_height, img_width, img_channel)):
 def inception_resnet(shape=(img_height, img_width, img_channel)):
 
     input_tensor = Input(shape=shape)
-    model = InceptionResNetV2(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    weights = 'imagenet' if shape[2] == 3 else None
+
+    model = InceptionResNetV2(include_top=False, weights=weights, input_tensor=input_tensor)
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)
@@ -85,7 +89,11 @@ def inception_resnet(shape=(img_height, img_width, img_channel)):
 def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes):
 
     input_tensor = Input(shape=shape)
-    model = Xception(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    weights = 'imagenet' if shape[2] == 3 else None
+    weights = None
+
+    model = Xception(include_top=False, weights=weights, input_tensor=input_tensor)
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)

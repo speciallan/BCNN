@@ -98,6 +98,7 @@ def build_generator(
         )
         train_generator = train_datagen.flow_from_directory(
             train_dir,
+            # color_mode='grayscale',
             target_size=target_size,
             batch_size=batch_size,
             class_mode='categorical'
@@ -113,6 +114,7 @@ def build_generator(
         )
         valid_generator = valid_datagen.flow_from_directory(
             valid_dir,
+            # color_mode='grayscale',
             target_size=target_size,
             batch_size=batch_size,
             class_mode='categorical'

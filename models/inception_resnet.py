@@ -38,7 +38,6 @@ from keras_applications.imagenet_utils import _obtain_input_shape
 # from keras.applications.imagenet_utils import _obtain_input_shape
 from keras import backend as K
 
-
 BASE_WEIGHT_URL = 'https://github.com/myutwo150/keras-inception-resnet-v2/releases/download/v0.1/'
 
 
@@ -183,6 +182,7 @@ def _inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
                    activation=None,
                    use_bias=True,
                    name=name_fmt('Conv2d_1x1'))
+
     x = Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
                output_shape=K.int_shape(x)[1:],
                arguments={'scale': scale},

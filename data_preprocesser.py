@@ -10,6 +10,10 @@ from tensorflow.python.keras.preprocessing.image import load_img, img_to_array, 
 from tensorflow.python.keras.backend import floatx
 import keras.backend as K
 import random
+import multiprocessing.pool
+from functools import partial
+from keras_preprocessing.image.utils import _list_valid_filenames_in_directory
+import warnings
 
 np.random.seed(3)
 
@@ -224,6 +228,7 @@ class DirectoryIterator(Keras_DirectoryIterator):
     #              data_format=None, save_to_dir=None,
     #              save_prefix='', save_format='png',
     #              follow_links=False, interpolation='nearest'):
+    #
     #     # 定义加载文件名list
     #     self.order_filenames = []
     #     if data_format is None:
@@ -291,7 +296,8 @@ class DirectoryIterator(Keras_DirectoryIterator):
     #     for dirpath in (os.path.join(directory, subdir) for subdir in classes):
     #         results.append(pool.apply_async(_list_valid_filenames_in_directory,
     #                                         (dirpath, white_list_formats,
-    #                                          self.class_indices, follow_links)))
+    #                                          (0.0,1.0),self.class_indices, follow_links)))
+    #
     #     for res in results:
     #         classes, filenames = res.get()
     #         self.classes[i:i + len(classes)] = classes
@@ -300,6 +306,8 @@ class DirectoryIterator(Keras_DirectoryIterator):
     #     pool.close()
     #     pool.join()
     #     super(DirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed)
+    #     print(11)
+    #     exit()
     #
     # def _get_batches_of_transformed_samples(self, index_array):
     #     batch_x = np.zeros((len(index_array),) + self.image_shape, dtype=K.floatx())
@@ -340,60 +348,57 @@ class DirectoryIterator(Keras_DirectoryIterator):
     #     else:
     #         return batch_x
     #     return batch_x, batch_y
+    #
+    # def next(self):
+    #     """For python 2.x.
+    #
+    #     # Returns
+    #         The next batch.
+    #     """
+    #     with self.lock:
+    #         index_array = next(self.index_generator)
+    #     # The transformation of images is not under thread lock
+    #     # so it can be done in parallel
+    #     return self._get_batches_of_transformed_samples(index_array)
 
 
-    # def _get_batches_of_transformed_samples(self, index_array):
-    #     batch_x = np.zeros(
-    #         (len(index_array),) + self.image_shape,
-    #         dtype=floatx())
-    #     grayscale = self.color_mode == 'grayscale'
-    #
-    #     # Build batch of image data
-    #     for i, j in enumerate(index_array):
-    #         fname = self.filenames[j]
-    #         img = load_img(
-    #             os.path.join(self.directory, fname),
-    #             grayscale=grayscale,
-    #             target_size=None,
-    #             interpolation=self.interpolation)
-    #         x = img_to_array(img, data_format=self.data_format)
-    #
-    #         # Pillow images should be closed after `load_img`, but not PIL images.
-    #         if hasattr(img, 'close'):
-    #             img.close()
-    #
-    #         x = self.image_data_generator.standardize(x)
-    #         batch_x[i] = x
-    #
-    #     # Optionally save augmented images to disk for debugging purposes
-    #     if self.save_to_dir:
-    #         for i, j in enumerate(index_array):
-    #             img = array_to_img(batch_x[i], self.data_format, scale=True)
-    #             fname = '{prefix}_{index}_{hash}.{format}'.format(
-    #                 prefix=self.save_prefix,
-    #                 index=j,
-    #                 hash=np.random.randint(1e7),
-    #                 format=self.save_format)
-    #             img.save(os.path.join(self.save_to_dir, fname))
-    #
-    #     # Build batch of labels
-    #     if self.class_mode == 'input':
-    #         batch_y = batch_x.copy()
-    #     elif self.class_mode == 'sparse':
-    #         batch_y = self.classes[index_array]
-    #     elif self.class_mode == 'binary':
-    #         batch_y = self.classes[index_array].astype(floatx())
-    #     elif self.class_mode == 'categorical':
-    #         batch_y = np.zeros(
-    #             (len(batch_x), self.num_classes),
-    #             dtype=floatx())
-    #         for i, label in enumerate(self.classes[index_array]):
-    #             batch_y[i, label] = 1.
-    #     else:
-    #         return batch_x
-    #
-    #     return batch_x, batch_y
+def _count_valid_files_in_directory(directory, white_list_formats, follow_links):
+    """Count files with extension in `white_list_formats` contained in directory.
+    对目录中包含的“white_list_formats”的扩展文件进行计数。
+    # Arguments
+    参数
+        directory: absolute path to the directory
+            containing files to be counted
+        directory:包含要计数的文件的目录的绝对路径
+        white_list_formats: set of strings containing allowed extensions for
+            the files to be counted.
+        white_list_formats:包含要被计数的文件的允许扩展的字符串集合。
+        follow_links: boolean.
+        follow_links: 布尔型
+    # Returns
+    返回
+        the count of files with extension in `white_list_formats` contained in
+        the directory.
+        目录中包含的扩展名为“white_list_formats”的文件计数。
+    """
 
+    def _recursive_list(subpath):
+        return sorted(os.walk(subpath, followlinks=follow_links), key=lambda x: x[0])
+
+    samples = 0
+    for _, _, files in _recursive_list(directory):
+        for fname in files:
+            is_valid = False
+            for extension in white_list_formats:
+                if fname.lower().endswith('.tiff'):
+                    warnings.warn('Using \'.tiff\' files with multiple bands will cause distortion. '
+                                  'Please verify your output.')
+                if fname.lower().endswith('.' + extension):
+                    is_valid = True
+                    break
+            if is_valid:
+                samples += 1
+    return samples
 
 class ImageDataGenerator(Keras_ImageDataGenerator):
     '''Inherit from keras' ImageDataGenerator.'''
@@ -419,6 +424,6 @@ class ImageDataGenerator(Keras_ImageDataGenerator):
             save_prefix=save_prefix,
             save_format=save_format,
             follow_links=follow_links,
-            subset=subset,
+            # subset=subset,
             interpolation=interpolation)
 

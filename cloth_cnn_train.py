@@ -8,7 +8,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense,Input
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications import VGG16, ResNet50, InceptionV3
 from keras.layers import Convolution2D, MaxPooling2D, ZeroPadding2D
@@ -30,11 +30,12 @@ set_runtime_environment()
 # avg h:77.1314209472982
 # avg r:6.703198380416794 imagenet-pre 224,224
 img_width, img_height = 224,224
-img_width, img_height = 320,80
+img_width, img_height, channel = 320,80,3
+# img_width, img_height, channel = 320,80,1
 # img_width, img_height = 480,80
 num_classes = 3
 
-input_tensor = Input(shape=(img_height, img_width, 3))
+input_tensor = Input(shape=(img_height, img_width, channel))
 
 
 # resnet50
@@ -50,8 +51,8 @@ input_tensor = Input(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
-# model = model_zoo.inception_resnet(shape=(img_height, img_width, 3))
-model = model_zoo.xception(shape=(img_height, img_width, 3))
+# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+model = model_zoo.xception(shape=(img_height, img_width, channel))
 # model = model_zoo.efficientnet_b4(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:-19]:
@@ -63,7 +64,7 @@ model = model_zoo.xception(shape=(img_height, img_width, 3))
 # weights_path = './model/cloth_resnet101_se.h5'
 weights_path = './model/cloth_xception.h5'
 # weights_path = './model/cloth.h5'
-model.load_weights(weights_path, by_name=True)
+model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
 # exit()
@@ -74,22 +75,24 @@ model.summary()
 # sample_nums = [7200, 7600, 11000]
 # sample_nums = [18000, 19000, 28230]
 
-# lr = 1e-3
+lr = 1e-3
+# lr = 1e-4
 # lr = 0.001 #ir
-lr = 1e-6 #x
+# lr = 1e-6 #x
+# lr = 1e-7 #x
 # lr = 0.256 #b
 model.compile(loss=focal_loss(),
-              optimizer=SGD(lr=lr, momentum=0.9),
+              optimizer=Adam(lr=lr),
               metrics=['accuracy']
               )
 
 train_data_dir = '../../data/cloth/splitted/train'
-train_data_dir = '../../data/cloth/origin'
+# train_data_dir = '../../data/cloth/origin'
 # validation_data_dir = '../../data/cloth/splitted/valid'
 # test a+b+c
 validation_data_dir = '../../data/cloth/test/test'
-nb_train_samples = 65208
-# nb_train_samples = 25712
+# nb_train_samples = 65208
+nb_train_samples = 25712
 # nb_train_samples = 5712
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257
@@ -109,7 +112,7 @@ train_generator, valid_generator = build_generator(
 
 # (16, 224, 224, 3) , (16, 3)
 # t = next(train_generator)
-# print(t[0].shape, t[0])
+# print(t[0].shape)
 # exit()
 
 model.fit_generator(

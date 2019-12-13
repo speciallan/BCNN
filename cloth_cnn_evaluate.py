@@ -21,7 +21,8 @@ from data_loader import build_generator, generator
 from BCNN.models import model_zoo
 
 img_width, img_height = 224,224
-img_width, img_height = 320,80
+img_width, img_height, channel = 320,80,3
+# img_width, img_height, channel = 320,80,1
 # img_width, img_height = 240,40
 # img_width, img_height = 480,80
 
@@ -32,8 +33,8 @@ img_width, img_height = 320,80
 # model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
-# model = model_zoo.inception_resnet(shape=(img_height, img_width, 3))
-model = model_zoo.xception(shape=(img_height, img_width, 3))
+# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+model = model_zoo.xception(shape=(img_height, img_width, channel))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
@@ -74,18 +75,26 @@ for idx, name in enumerate(test_name_arr):
 
     test_generator = test_generator[0]
     # t = next(test_generator)
-    # print(t[0].shape, t[1].shape, t[0][0])
-    # exit()
+    # print(t[0].shape, t[1].shape)
 
     sum = 0
     tp = 0
     wrong = [0, 0, 0]
-    total_iters = int(math.ceil(total*1.0 / batch_size))
-    for i in range(total_iters):
+    # total_iters = int(math.ceil(total*1.0 / batch_size))
+    # for i in range(total_iters):
+    iter_total = 5
+    iter = 0
+    for data in test_generator:
+
+        if iter > iter_total:
+            break
+        iter += 1
+
         # print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
-        data = next(test_generator)
         test_imgs = data[0]
         true_labels = data[1]
+        start = test_generator.batch_index
+        filenames = test_generator.filenames[start: start + test_generator.batch_size]
 
         result = model.predict_on_batch(test_imgs)
 
@@ -96,12 +105,16 @@ for idx, name in enumerate(test_name_arr):
         sum += len(true_labels)
 
         # 评估
-        for k,v in enumerate(true_labels):
-            if true_labels[k] == pred_labels[k]:
-                tp += 1
-            else:
-                # print('true:{}, wrong:{}, prob:{}'.format(true_labels[k], pred_labels[k], result[k]))
-                wrong[true_labels[k]] += 1
+        try:
+            for k,v in enumerate(true_labels):
+                if true_labels[k] == pred_labels[k]:
+                    tp += 1
+                else:
+                    print('true:{}, wrong:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
+                    wrong[true_labels[k]] += 1
+
+        except Exception as e:
+            print(e, idx, start, batch_size, len(filenames), k)
 
     print('total: {}, acc: {:.3f}'.format(sum, tp*1.0/sum))
     # print('wrong: {}'.format(wrong))

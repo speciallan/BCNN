@@ -49,6 +49,10 @@ baseline：resnet50
 | inception_resnet(ks+train+fl+aug+480,80) | 0.007 | 0.988 | # | 0.971 | 0.750 | 0.929 | testA提高 |
 | xception(ks+train+fl+aug+240,40) | 0.037 | **0.863** | # | **0.876** | 0.670 | **0.911** | testA提高 |
 | xception(ks+train+fl+aug+320,80) | 0.013 | **0.984** | # | **0.971** | 0.745 | **0.946** | testA提高 |
+| xception(ks+train+se+fl+aug+320,80) | 0.013 | **0.984** | # | **0.969** | 0.710 | **0.964** | se后 |
+| xception(ks+train+se+fl+aug+320,80+gray) | 0.106 | **0.956** | low | # | # | # | 灰度图效果不好 |
+| xception(ks+train+se+fl+aug+320,80+fill) | # | # | low | # | # | # | 填充效果不好 |
+| xception(ks+train+aug+320,80) | 0.19 | 0.952 | # | **0.975** | 0.715 | 0.571 | 没fl |
 | xception(ks+train+fl+aug+400,80) | 0.014 | 0.947 | # | 0.961 | 0.745 | 0.839 | # |
 | xception(ks+train+fl+aug+480,80) | 0.018 | 0.938 | # | 0.951 | 0.730 | 0.768 | # |
 | snet | # | # |

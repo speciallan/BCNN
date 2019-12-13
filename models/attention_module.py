@@ -12,7 +12,7 @@ def attach_attention_module(net, attention_module):
 
   return net
 
-def se_block(input_feature, ratio=16):
+def se_block(input_feature, ratio=4):
 	"""Contains the implementation of Squeeze-and-Excitation(SE) block.
 	As described in https://arxiv.org/abs/1709.01507.
 	"""

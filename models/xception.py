@@ -233,9 +233,9 @@ def Xception(include_top=True,
         x = layers.BatchNormalization(name=prefix + '_sepconv3_bn')(x)
 
         # attention_module
-        attention_module = 'se_block'
-        if attention_module is not None:
-            x = attach_attention_module(x, attention_module)
+        # attention_module = 'se_block'
+        # if attention_module is not None:
+        #     x = attach_attention_module(x, attention_module)
 
         x = layers.add([x, residual])
 

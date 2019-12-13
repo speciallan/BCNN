@@ -46,7 +46,7 @@ def get_callback(model_path, model_name, log_path='./logs', period=3):
                                    factor=0.1,     # 减少学习率的因子，学习率将以lr = lr*factor的形式被减少
                                    cooldown=0,     # 学习率减少后，会经过cooldown个epoch才重新进行检查
                                    patience=2,     # 经过patience个epoch后，如果检测值没变化，则出发学习率减少
-                                   min_lr=1e-6,
+                                   min_lr=1e-8,
                                    verbose=1,
                                    mode='auto')    # 最小学习率
 

@@ -41,7 +41,7 @@ model = model_zoo.xception(shape=(img_height, img_width, channel))
 
 # weights_path = './model/cloth_resnet101_fl.h5'
 weights_path = './model/cloth_xception.h5'
-# weights_path = './model/cloth.h5'
+weights_path = './model/cloth.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
@@ -57,7 +57,7 @@ batch_size = 512
 classes = ['01', '02', '99']
 test_name_arr = ['test_a', 'test_b', 'test_c']
 test_total_arr = [3257, 200, 56]
-test_batch_arr = [256, 200, 56]
+test_batch_arr = [256, 128, 32]
 
 # -------------------------------------------------------------------
 
@@ -80,15 +80,10 @@ for idx, name in enumerate(test_name_arr):
     sum = 0
     tp = 0
     wrong = [0, 0, 0]
-    # total_iters = int(math.ceil(total*1.0 / batch_size))
-    # for i in range(total_iters):
-    iter_total = 5
-    iter = 0
-    for data in test_generator:
+    total_iters = int(math.ceil(total*1.0 / batch_size))
+    for i in range(total_iters):
 
-        if iter > iter_total:
-            break
-        iter += 1
+        data = next(test_generator)
 
         # print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
         test_imgs = data[0]
@@ -110,11 +105,12 @@ for idx, name in enumerate(test_name_arr):
                 if true_labels[k] == pred_labels[k]:
                     tp += 1
                 else:
-                    print('true:{}, wrong:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
+                    # print('true:{}, wrong:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
                     wrong[true_labels[k]] += 1
 
         except Exception as e:
             print(e, idx, start, batch_size, len(filenames), k)
+            continue
 
     print('total: {}, acc: {:.3f}'.format(sum, tp*1.0/sum))
     # print('wrong: {}'.format(wrong))

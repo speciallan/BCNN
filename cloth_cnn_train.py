@@ -8,6 +8,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense,Input
+from keras.losses import categorical_crossentropy
 from keras.optimizers import SGD, Adam
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications import VGG16, ResNet50, InceptionV3
@@ -31,7 +32,7 @@ set_runtime_environment()
 # avg r:6.703198380416794 imagenet-pre 224,224
 img_width, img_height = 224,224
 img_width, img_height, channel = 320,80,3
-# img_width, img_height, channel = 320,80,1
+# img_width, img_height, channel = 600,200,3
 # img_width, img_height = 480,80
 num_classes = 3
 
@@ -63,22 +64,20 @@ model = model_zoo.xception(shape=(img_height, img_width, channel))
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
 weights_path = './model/cloth_xception.h5'
+# weights_path = './model/cloth_xception_se.h5'
 # weights_path = './model/cloth.h5'
 model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
 # exit()
 
-# model.compile(loss='categorical_crossentropy',
-#                optimizer = SGD(lr=1e-3,momentum=0.9),
-#                metrics=['accuracy'])
 # sample_nums = [7200, 7600, 11000]
 # sample_nums = [18000, 19000, 28230]
 
 lr = 1e-3
 # lr = 1e-4
 # lr = 0.001 #ir
-# lr = 1e-6 #x
+lr = 1e-6 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
 model.compile(loss=focal_loss(),
@@ -87,10 +86,12 @@ model.compile(loss=focal_loss(),
               )
 
 train_data_dir = '../../data/cloth/splitted/train'
+# train_data_dir = '../../data/cloth/splitted/train_320'
 # train_data_dir = '../../data/cloth/origin'
 # validation_data_dir = '../../data/cloth/splitted/valid'
 # test a+b+c
 validation_data_dir = '../../data/cloth/test/test'
+# validation_data_dir = '../../data/cloth/test/test_320'
 # nb_train_samples = 65208
 nb_train_samples = 25712
 # nb_train_samples = 5712
@@ -121,7 +122,9 @@ model.fit_generator(
     epochs=epochs,
     validation_data=valid_generator,
     validation_steps=nb_validation_samples // batch_size,
-    callbacks=get_callback(model_path, model_name, period=2))
+    callbacks=get_callback(model_path, model_name, period=2),
+    use_multiprocessing=True,
+    workers=4)
 
 # model2.save_weights(model_path + '/' + model_name + '.h5')
 

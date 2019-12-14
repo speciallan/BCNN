@@ -80,7 +80,8 @@ lr = 1e-3
 lr = 1e-6 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
-model.compile(loss=focal_loss(),
+categorical_crossentropy(label_s)
+model.compile(loss=focal_loss(gamma=2., alpha=0.25, num_classes=num_classes),
               optimizer=Adam(lr=lr),
               metrics=['accuracy']
               )

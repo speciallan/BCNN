@@ -8,7 +8,7 @@ from tensorflow.python.ops import array_ops
 # import numpy as np
 
 # 2.0 0.25
-def focal_loss(gamma=2., alpha=0.25, num_classes=3):
+def focal_loss(gamma=2., alpha=0.25, num_classes=3, smoothing=None):
 
     def focal_loss_fixed(y_true, y_pred):
         """
@@ -28,8 +28,8 @@ def focal_loss(gamma=2., alpha=0.25, num_classes=3):
         y_pred += K.epsilon()
 
         # smooth
-        smoothing = 0.1
-        y_true -= smoothing * (y_true - 1. / tf.cast(num_classes, y_true.dtype))
+        if smoothing:
+            y_true -= smoothing * (y_true - 1. / tf.cast(num_classes, y_true.dtype))
 
         # Cross entropy
         ce = -y_true * tf.log(y_pred)

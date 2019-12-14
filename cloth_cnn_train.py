@@ -77,11 +77,13 @@ model.summary()
 lr = 1e-3
 # lr = 1e-4
 # lr = 0.001 #ir
-lr = 1e-6 #x
+# lr = 1e-6 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
-categorical_crossentropy(label_s)
-model.compile(loss=focal_loss(gamma=2., alpha=0.25, num_classes=num_classes),
+model.compile(loss=focal_loss(gamma=2.,
+                              alpha=0.25,
+                              num_classes=num_classes,
+                              smoothing=0.1),
               optimizer=Adam(lr=lr),
               metrics=['accuracy']
               )

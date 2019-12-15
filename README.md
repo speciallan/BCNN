@@ -29,6 +29,7 @@ baseline：resnet50
 (15)使用更好的模型，硬性提高精度
 (16)triple loss
 (17)双阈值二阶段分类(dis<t1 -1 dis>t2 1)
+(18)使用FC代替GAP
 
 #3、细粒度分类
 (1)BCNN done

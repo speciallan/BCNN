@@ -52,8 +52,8 @@ input_tensor = Input(shape=(img_height, img_width, channel))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
-# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
-model = model_zoo.xception(shape=(img_height, img_width, channel))
+model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+# model = model_zoo.xception(shape=(img_height, img_width, channel))
 # model = model_zoo.efficientnet_b4(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:-19]:
@@ -64,6 +64,7 @@ model = model_zoo.xception(shape=(img_height, img_width, channel))
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
 weights_path = './model/cloth_xception.h5'
+weights_path = './model/cloth_ir.h5'
 # weights_path = './model/cloth_xception_se.h5'
 # weights_path = './model/cloth.h5'
 model.load_weights(weights_path, by_name=True, skip_mismatch=True)
@@ -74,16 +75,17 @@ model.summary()
 # sample_nums = [7200, 7600, 11000]
 # sample_nums = [18000, 19000, 28230]
 
-lr = 1e-3
+# lr = 1e-3
 # lr = 1e-4
-# lr = 0.001 #ir
+lr = 0.001 #ir
 # lr = 1e-6 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
 model.compile(loss=focal_loss(gamma=2.,
                               alpha=0.25,
                               num_classes=num_classes,
-                              smoothing=0.1),
+                              # smoothing=0.1
+                              ),
               optimizer=Adam(lr=lr),
               metrics=['accuracy']
               )
@@ -126,8 +128,9 @@ model.fit_generator(
     validation_data=valid_generator,
     validation_steps=nb_validation_samples // batch_size,
     callbacks=get_callback(model_path, model_name, period=2),
-    use_multiprocessing=True,
-    workers=4)
+    # use_multiprocessing=True,
+    # workers=4
+)
 
 # model2.save_weights(model_path + '/' + model_name + '.h5')
 

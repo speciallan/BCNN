@@ -91,12 +91,14 @@ def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes
     input_tensor = Input(shape=shape)
 
     weights = 'imagenet' if shape[2] == 3 else None
-    weights = None
 
     model = Xception(include_top=False, weights=weights, input_tensor=input_tensor)
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)
+    # x = Flatten()(x)
+    # x = Dense(100, activation='softmax', name='fc1')(x)
+    # x = Dropout(rate=0.5)(x)
     x = Dense(num_classes, activation='softmax', name='fc')(x)
 
     model2 = Model(inputs=model.input, outputs=x)
@@ -110,6 +112,7 @@ def efficientnet_b4(shape=(img_height, img_width, img_channel), num_classes=num_
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)
+    # x = layers.Dense(num_classes)(x)
     x = layers.Dense(num_classes, kernel_initializer=EfficientNetDenseInitializer())(x)
 
     model2 = Model(inputs=model.input, outputs=x)

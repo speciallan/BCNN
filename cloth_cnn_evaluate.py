@@ -33,8 +33,8 @@ img_width, img_height, channel = 320,80,3
 # model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
-# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
-model = model_zoo.xception(shape=(img_height, img_width, channel))
+model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+# model = model_zoo.xception(shape=(img_height, img_width, channel))
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True

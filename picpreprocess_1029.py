@@ -137,9 +137,9 @@ if __name__ == '__main__':
                         image = imgs[k]
 
                         # gray
-                        image, light = aug(image)
-                        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                        image = image[:,:,np.newaxis]
+                        # image, light = aug(image)
+                        # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                        # image = image[:,:,np.newaxis]
 
                         #存三通道or单通道
                         #image = np.concatenate((image, image, image), axis=2)

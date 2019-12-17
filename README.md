@@ -68,8 +68,9 @@ baseline：resnet50
 | xception(ks+train+fl+aug+480,80) | 0.018 | 0.938 | # | 0.951 | 0.730 | 0.768 | # |
 | snet | # | # |
 | snetplus | # | # |
-| BCNN + xception | 0.013 | 0.954 | # | 0.967 | 0.735 | 0.982 |
+| BCNN + xception | 0.013 | 0.954 | # | **0.969** | 0.735 | **0.982** |
 | BCNN + xception(gray) | 0.020 | 0.917 | # | 0.930 | 0.683 | 0.609 |
+| BCNN + xception(480) | 0.020 | 0.917 | # | 0.930 | 0.683 | 0.609 |
 | inception_resnet(ks+train+fl+aug+320,80+gray) | 0.031 | 0.874 | # | 0.894 | 0.660 | 0.589 | # |
 
 二分类

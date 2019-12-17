@@ -32,7 +32,7 @@ set_runtime_environment()
 # avg r:6.703198380416794 imagenet-pre 224,224
 img_width, img_height = 224,224
 img_width, img_height, channel = 320,80,3
-img_width, img_height, channel = 480,80,3
+# img_width, img_height, channel = 480,80,3
 # img_width, img_height, channel = 600,200,3
 # img_width, img_height = 480,80
 num_classes = 3
@@ -85,7 +85,7 @@ model.summary()
 # lr = 0.001 #ir
 lr = 1e-6 #x
 # lr = 1e-5 #x
-# lr = 5e-5 #x
+lr = 3e-5 #x
 # lr = 5e-7 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
@@ -93,7 +93,7 @@ lr = 1e-6 #x
 model.compile(loss=focal_loss(gamma=2.,
                               alpha=0.25,
                               num_classes=num_classes,
-                              smoothing=0.3
+                              smoothing=0.1
                               ),
               optimizer=Adam(lr=lr),
               metrics=['accuracy']
@@ -108,7 +108,7 @@ validation_data_dir = '../../data/cloth/test/test'
 # validation_data_dir = '../../data/cloth/test/test_320'
 # nb_train_samples = 65208
 nb_train_samples = 25712
-nb_train_samples = 5712
+# nb_train_samples = 5712
 # nb_train_samples = 10000
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257

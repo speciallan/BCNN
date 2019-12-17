@@ -22,6 +22,7 @@ from BCNN.models import model_zoo
 
 img_width, img_height = 224,224
 img_width, img_height, channel = 320,80,3
+# img_width, img_height, channel = 480,80,3
 # img_width, img_height, channel = 320,80,1
 # img_width, img_height = 240,40
 # img_width, img_height, channel = 600,150,3
@@ -45,6 +46,7 @@ model = model_zoo.bcnn(shape=(img_height, img_width, channel))
 # weights_path = './model/cloth_xception.h5'
 # weights_path = './model/cloth_bcnn_xception_cbam.h5'
 weights_path = './model/cloth_bcnn_xception.h5'
+# weights_path = './model/cloth_bcnn_xception_480.h5'
 # weights_path = './model/cloth.h5'
 # weights_path = './model/cloth_bcnn_gray.h5'
 model.load_weights(weights_path, by_name=True)
@@ -125,8 +127,8 @@ for idx, name in enumerate(test_name_arr):
                     wrong[true_labels[k]] += 1
 
                 # 打印
-                if 'center_4_2-3' in filenames[k]:
-                    print('true:{}, pred:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
+                # if 'center_4_2-3' in filenames[k]:
+                #     print('true:{}, pred:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
 
         except Exception as e:
             print(e, idx, start, batch_size, len(filenames), k)

@@ -20,19 +20,19 @@ baseline：resnet50
 (7)更好的特征提取网络，resnext ing
 (8)改进损失，focal loss用于多分类任务 done
 
-(9)增加标签平滑，提高泛化能力
+(9)增加标签平滑，提高泛化能力 done
 (10)unknown问题，
 (11)增加全局特征，此任务不是通过局部特征就能更好分类。
 (12)集成学习，多模型融合
 (13)规则+策略+模型，多策略，通过规则提高召回率
 (14)解决数据渗出问题 http://www.atyun.com/32180.html
-(15)使用更好的模型，硬性提高精度
-(16)triple loss
+(15)使用更好的模型，硬性提高精度 ing
+(16)triple loss  ing
 (17)双阈值二阶段分类(dis<t1 -1 dis>t2 1)
-(18)使用FC代替GAP
+(18)使用FC代替GAP done
 
 #3、细粒度分类
-(1)BCNN done
+(1)BCNN done 能提高训练稳定性和泛化能力
 
 #4、分析错误样本
 可视化特征与激活图 grad-cam
@@ -68,7 +68,8 @@ baseline：resnet50
 | xception(ks+train+fl+aug+480,80) | 0.018 | 0.938 | # | 0.951 | 0.730 | 0.768 | # |
 | snet | # | # |
 | snetplus | # | # |
-| BCNN | 0.714 | 0.814 | 
+| BCNN + xception | 0.013 | 0.954 | # | 0.967 | 0.735 | 0.982 |
+| BCNN + xception(gray) | 0.020 | 0.917 | # | 0.930 | 0.683 | 0.609 |
 | inception_resnet(ks+train+fl+aug+320,80+gray) | 0.031 | 0.874 | # | 0.894 | 0.660 | 0.589 | # |
 
 二分类

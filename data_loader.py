@@ -91,10 +91,12 @@ def build_generator(
             samplewise_center=True,
             samplewise_std_normalization=True,
             # preprocessing_function=train_preprocessing,
-            rotation_range=20,
+            # rotation_range=20,
             width_shift_range=0.2,
             height_shift_range=0.2,
-            horizontal_flip=True
+            # zoom_range=0.1,
+            horizontal_flip=True,
+            vertical_flip=True,
         )
         train_generator = train_datagen.flow_from_directory(
             train_dir,

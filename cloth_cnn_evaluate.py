@@ -24,7 +24,7 @@ img_width, img_height = 224,224
 img_width, img_height, channel = 320,80,3
 # img_width, img_height, channel = 320,80,1
 # img_width, img_height = 240,40
-# img_width, img_height = 480,80
+# img_width, img_height, channel = 600,150,3
 
 # model = model_zoo.resnet50(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet32_se(shape=(img_height, img_width, 3))
@@ -33,15 +33,20 @@ img_width, img_height, channel = 320,80,3
 # model = model_zoo.resnet20_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
-model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
 # model = model_zoo.xception(shape=(img_height, img_width, channel))
+model = model_zoo.bcnn(shape=(img_height, img_width, channel))
+# model = model_zoo.bcnn(shape=(img_height, img_width, channel), attention_module='cbam_block')
 
 # for layer in model2.layers[:]: # set the first 11 layers(fine tune conv4 and conv5 block can also further improve accuracy
 #     layer.trainable = True
 
 # weights_path = './model/cloth_resnet101_fl.h5'
-weights_path = './model/cloth_xception.h5'
-weights_path = './model/cloth.h5'
+# weights_path = './model/cloth_xception.h5'
+# weights_path = './model/cloth_bcnn_xception_cbam.h5'
+weights_path = './model/cloth_bcnn_xception.h5'
+# weights_path = './model/cloth.h5'
+# weights_path = './model/cloth_bcnn_gray.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
@@ -55,16 +60,19 @@ total = 56
 batch_size = 512
 # batch_size = 16
 classes = ['01', '02', '99']
-test_name_arr = ['test_a', 'test_b', 'test_c']
-test_total_arr = [3257, 200, 56]
-test_batch_arr = [256, 128, 32]
+test_name_arr = ['test_a', 'test_b', 'test_c', '1', '2', '3']
+# test_total_arr = [3257, 200, 56, 4828, 2262, 1696]
+test_batch_arr = [32, 32, 32, 32, 32, 32]
+# test_name_arr = ['test_a_320', 'test_b_320', 'test_c_320']
+# test_total_arr = [3257, 200, 56]
+# test_batch_arr = [32, 32, 32]
 
 # -------------------------------------------------------------------
 
 for idx, name in enumerate(test_name_arr):
 
     test_data_dir_1 = test_data_dir + name
-    total = test_total_arr[idx]
+    # total = test_total_arr[idx]
     batch_size = test_batch_arr[idx]
 
     test_generator = build_generator(
@@ -74,22 +82,30 @@ for idx, name in enumerate(test_name_arr):
         batch_size=batch_size)
 
     test_generator = test_generator[0]
+
     # t = next(test_generator)
+    total = test_generator.samples
+    # for a,tt in enumerate(test_generator):
+    #     print(tt[0].shape, a, test_generator.batch_index)
+    # exit()
     # print(t[0].shape, t[1].shape)
 
     sum = 0
     tp = 0
     wrong = [0, 0, 0]
     total_iters = int(math.ceil(total*1.0 / batch_size))
-    for i in range(total_iters):
 
-        data = next(test_generator)
+    # for i in range(total_iters):
+    for i, data in enumerate(test_generator):
 
         # print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
         test_imgs = data[0]
         true_labels = data[1]
-        start = test_generator.batch_index
-        filenames = test_generator.filenames[start: start + test_generator.batch_size]
+        start = i * batch_size
+
+        # 索引
+        index_array = test_generator.index_array[start:start + test_generator.batch_size].tolist()
+        filenames = [test_generator.filenames[j] for j in index_array]
 
         result = model.predict_on_batch(test_imgs)
 
@@ -105,12 +121,20 @@ for idx, name in enumerate(test_name_arr):
                 if true_labels[k] == pred_labels[k]:
                     tp += 1
                 else:
-                    # print('true:{}, wrong:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
+                    # print('true:{}, pred:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
                     wrong[true_labels[k]] += 1
+
+                # 打印
+                if 'center_4_2-3' in filenames[k]:
+                    print('true:{}, pred:{}, prob:{}, name:{}'.format(true_labels[k], pred_labels[k], result[k], filenames[k]))
 
         except Exception as e:
             print(e, idx, start, batch_size, len(filenames), k)
             continue
+
+        # 结束生成器
+        if test_generator.batch_index == 0:
+            break
 
     print('total: {}, acc: {:.3f}'.format(sum, tp*1.0/sum))
     # print('wrong: {}'.format(wrong))

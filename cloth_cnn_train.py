@@ -32,6 +32,7 @@ set_runtime_environment()
 # avg r:6.703198380416794 imagenet-pre 224,224
 img_width, img_height = 224,224
 img_width, img_height, channel = 320,80,3
+img_width, img_height, channel = 480,80,3
 # img_width, img_height, channel = 600,200,3
 # img_width, img_height = 480,80
 num_classes = 3
@@ -52,8 +53,10 @@ input_tensor = Input(shape=(img_height, img_width, channel))
 # model = model_zoo.resnet38_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet101_se(shape=(img_height, img_width, 3))
 # model = model_zoo.resnet152_se(shape=(img_height, img_width, 3))
-model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
+# model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
 # model = model_zoo.xception(shape=(img_height, img_width, channel))
+model = model_zoo.bcnn(shape=(img_height, img_width, channel))
+# model = model_zoo.inceptionv3(shape=(img_height, img_width, channel))
 # model = model_zoo.efficientnet_b4(shape=(img_height, img_width, 3))
 
 # for layer in model.layers[:-19]:
@@ -64,9 +67,11 @@ model = model_zoo.inception_resnet(shape=(img_height, img_width, channel))
 # weights_path = '../taurus_cv/pretrained_models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 # weights_path = './model/cloth_resnet101_se.h5'
 weights_path = './model/cloth_xception.h5'
-weights_path = './model/cloth_ir.h5'
+# weights_path = './model/cloth_ir.h5'
 # weights_path = './model/cloth_xception_se.h5'
+weights_path = './model/cloth_bcnn_xception.h5'
 # weights_path = './model/cloth.h5'
+# weights_path = './model/cloth_bcnn_gray.h5'
 model.load_weights(weights_path, by_name=True, skip_mismatch=True)
 
 model.summary()
@@ -77,14 +82,18 @@ model.summary()
 
 # lr = 1e-3
 # lr = 1e-4
-lr = 0.001 #ir
-# lr = 1e-6 #x
+# lr = 0.001 #ir
+lr = 1e-6 #x
+# lr = 1e-5 #x
+# lr = 5e-5 #x
+# lr = 5e-7 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
+# model.compile(loss=categorical_crossentropy, optimizer=Adam(lr=lr), metrics=['acc'])
 model.compile(loss=focal_loss(gamma=2.,
                               alpha=0.25,
                               num_classes=num_classes,
-                              # smoothing=0.1
+                              smoothing=0.3
                               ),
               optimizer=Adam(lr=lr),
               metrics=['accuracy']
@@ -99,13 +108,14 @@ validation_data_dir = '../../data/cloth/test/test'
 # validation_data_dir = '../../data/cloth/test/test_320'
 # nb_train_samples = 65208
 nb_train_samples = 25712
-# nb_train_samples = 5712
+nb_train_samples = 5712
+# nb_train_samples = 10000
 # nb_validation_samples = 6428
 # nb_validation_samples = 3257
 nb_validation_samples = 3437
 # nb_validation_samples = 1000
 epochs = 50
-batch_size = 32 # resnet50#64 101#128 152#48
+batch_size = 16 # resnet50#64 101#128 152#48
 classes = ['01', '02', '99']
 model_path = './model'
 model_name = 'cloth_resnet50_se'
@@ -127,7 +137,7 @@ model.fit_generator(
     epochs=epochs,
     validation_data=valid_generator,
     validation_steps=nb_validation_samples // batch_size,
-    callbacks=get_callback(model_path, model_name, period=2),
+    callbacks=get_callback(model_path, model_name, period=1),
     # use_multiprocessing=True,
     # workers=4
 )

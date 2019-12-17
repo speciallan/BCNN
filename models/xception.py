@@ -35,6 +35,7 @@ def Xception(include_top=True,
              input_shape=None,
              pooling=None,
              classes=1000,
+             attention_module=None,
              **kwargs):
     """Instantiates the Xception architecture.
 
@@ -233,9 +234,8 @@ def Xception(include_top=True,
         x = layers.BatchNormalization(name=prefix + '_sepconv3_bn')(x)
 
         # attention_module
-        # attention_module = 'se_block'
-        # if attention_module is not None:
-        #     x = attach_attention_module(x, attention_module)
+        if attention_module is not None:
+            x = attach_attention_module(x, attention_module)
 
         x = layers.add([x, residual])
 

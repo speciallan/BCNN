@@ -117,6 +117,9 @@ if __name__ == '__main__':
     rootpath = '../../data/cloth/test/test/'
     des = '../../data/cloth/test/test_320/'
 
+    # rootpath = '../../data/cloth/test/test_c/'
+    # des = '../../data/cloth/test/test_c_320/'
+
     for fibre in os.listdir(rootpath):
         # if fibre == '01':
         #     continue

@@ -6,13 +6,14 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, GlobalAvgPool2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense,Input, Add
 from keras.models import Model
-from keras.applications import VGG16, ResNet50
+from keras.applications import VGG16, ResNet50, InceptionV3
 import keras_resnet
 from keras_resnet.models import ResNet101
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from BCNN.models.resnet_v1 import resnet_v1
 from BCNN.models.xception import Xception
 from BCNN.models.attention_module import attach_attention_module
+from BCNN.models.bcnn import bilinear_cnn
 from taurus_cv.models.resnet.snet import snettz
 
 from keras.utils import get_file
@@ -38,6 +39,18 @@ def snet(shape=(img_height, img_width, img_channel)):
     x = GlobalAvgPool2D(name='avg_pool')(x)
     x = Dense(num_classes, activation='softmax', name='fc')(x)
     return Model(inputs=input_tensor, outputs=x)
+
+def inceptionv3(shape=(img_height, img_width, img_channel), num_classes=num_classes):
+    input_tensor = Input(shape=shape)
+    model = InceptionV3(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    x = model.output
+    x = GlobalAvgPool2D(name='avg_pool')(x)
+    x = Dense(num_classes, activation='softmax', name='fc')(x)
+
+    model2 = Model(inputs=model.input, outputs=x)
+
+    return model2
 
 def resnet50(shape=(img_height, img_width, img_channel), num_classes=num_classes):
 
@@ -86,13 +99,14 @@ def inception_resnet(shape=(img_height, img_width, img_channel)):
 
     return model2
 
-def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes):
+def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes, attention_module=None):
 
     input_tensor = Input(shape=shape)
 
     weights = 'imagenet' if shape[2] == 3 else None
+    weights = None
 
-    model = Xception(include_top=False, weights=weights, input_tensor=input_tensor)
+    model = Xception(include_top=False, weights=weights, input_tensor=input_tensor, attention_module=attention_module)
 
     x = model.output
     x = GlobalAvgPool2D(name='avg_pool')(x)
@@ -104,6 +118,13 @@ def xception(shape=(img_height, img_width, img_channel), num_classes=num_classes
     model2 = Model(inputs=model.input, outputs=x)
 
     return model2
+
+def bcnn(shape=(img_height, img_width, img_channel), num_classes=num_classes, attention_module=None):
+
+    model = bilinear_cnn(size=shape, class_num=num_classes, attention_module=attention_module)
+    # for i,layer in enumerate(model.layers[:40]):
+    #     layer.trainable = False
+    return model
 
 def efficientnet_b4(shape=(img_height, img_width, img_channel), num_classes=num_classes):
 

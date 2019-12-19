@@ -95,7 +95,8 @@ model.compile(loss=focal_loss(gamma=2.,
                               num_classes=num_classes,
                               smoothing=0.1
                               ),
-              optimizer=Adam(lr=lr),
+              # optimizer=Adam(lr=lr),
+              optimizer=SGD(lr=lr, momentum=0.9),
               metrics=['accuracy']
               )
 

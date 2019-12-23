@@ -10,6 +10,7 @@ from keras.applications import VGG16, ResNet50, InceptionV3
 import keras_resnet
 from keras_resnet.models import ResNet101
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
+from keras.applications.densenet import DenseNet121
 from BCNN.models.resnet_v1 import resnet_v1
 from BCNN.models.xception import Xception
 from BCNN.models.attention_module import attach_attention_module

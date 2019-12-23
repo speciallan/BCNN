@@ -80,12 +80,13 @@ model.summary()
 # sample_nums = [7200, 7600, 11000]
 # sample_nums = [18000, 19000, 28230]
 
-# lr = 1e-3
-# lr = 1e-4
+lr = 1e-3
+lr = 1e-4
 # lr = 0.001 #ir
 lr = 1e-6 #x
+# lr = 3e-7 #x
 # lr = 1e-5 #x
-lr = 3e-5 #x
+# lr = 3e-5 #x
 # lr = 5e-7 #x
 # lr = 1e-7 #x
 # lr = 0.256 #b
@@ -100,9 +101,9 @@ model.compile(loss=focal_loss(gamma=2.,
               metrics=['accuracy']
               )
 
-train_data_dir = '../../data/cloth/splitted/train'
+# train_data_dir = '../../data/cloth/splitted/train'
 # train_data_dir = '../../data/cloth/splitted/train_320'
-# train_data_dir = '../../data/cloth/origin'
+train_data_dir = '../../data/cloth/origin'
 # validation_data_dir = '../../data/cloth/splitted/valid'
 # test a+b+c
 validation_data_dir = '../../data/cloth/test/test'
@@ -131,6 +132,23 @@ train_generator, valid_generator = build_generator(
 # t = next(train_generator)
 # print(t[0].shape)
 # exit()
+
+# for i in range(total_iters):
+# try:
+#     for i, data in enumerate(train_generator):
+#
+#         # print('正在评估第 {}/{} 个循环'.format(i+1, total_iters))
+#         test_imgs = data[0]
+#         true_labels = data[1]
+#         start = i * batch_size
+#
+#         # 索引
+#         index_array = train_generator.index_array[start:start + train_generator.batch_size].tolist()
+#         filenames = [train_generator.filenames[j] for j in index_array]
+# except Exception as e:
+#     print(filenames)
+
+
 
 model.fit_generator(
     train_generator,

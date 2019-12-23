@@ -91,7 +91,7 @@ def build_generator(
             samplewise_center=True,
             samplewise_std_normalization=True,
             # preprocessing_function=train_preprocessing,
-            rotation_range=20,
+            rotation_range=5,
             width_shift_range=0.2,
             height_shift_range=0.2,
             zoom_range=0.1,
@@ -103,7 +103,8 @@ def build_generator(
             # color_mode='grayscale',
             target_size=target_size,
             batch_size=batch_size,
-            class_mode='categorical'
+            class_mode='categorical',
+            shuffle=True
         )
         results += [train_generator]
 
@@ -119,7 +120,8 @@ def build_generator(
             # color_mode='grayscale',
             target_size=target_size,
             batch_size=batch_size,
-            class_mode='categorical'
+            class_mode='categorical',
+            shuffle=True
         )
         results += [valid_generator]
 

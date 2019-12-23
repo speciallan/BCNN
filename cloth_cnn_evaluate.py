@@ -47,12 +47,12 @@ model = model_zoo.bcnn(shape=(img_height, img_width, channel))
 # weights_path = './model/cloth_bcnn_xception_cbam.h5'
 weights_path = './model/cloth_bcnn_xception.h5'
 # weights_path = './model/cloth_bcnn_xception_480.h5'
-# weights_path = './model/cloth.h5'
+weights_path = './model/cloth.h5'
 # weights_path = './model/cloth_bcnn_gray.h5'
 model.load_weights(weights_path, by_name=True)
 print('Model loaded.')
 
-test_data_dir = '../../data/cloth/splitted/test'
+# test_data_dir = '../../data/cloth/splitted/test'
 test_data_dir = '../../data/cloth/test/'
 # total = 32130
 total = 3257
@@ -62,12 +62,11 @@ total = 56
 batch_size = 512
 # batch_size = 16
 classes = ['01', '02', '99']
-test_name_arr = ['test_a', 'test_b', 'test_c', '1', '2', '3']
+# test_name_arr = ['test_a', 'test_b', 'test_c', '1', '2', '3']
 # test_total_arr = [3257, 200, 56, 4828, 2262, 1696]
-test_batch_arr = [32, 32, 32, 32, 32, 32]
-# test_name_arr = ['test_a_320', 'test_b_320', 'test_c_320']
-# test_total_arr = [3257, 200, 56]
-# test_batch_arr = [32, 32, 32]
+# test_batch_arr = [32, 32, 32, 32, 32, 32]
+test_name_arr = ['test_a', 'test_b', 'test_c', 'test_d']
+test_batch_arr = [32, 32, 32, 32]
 
 # -------------------------------------------------------------------
 

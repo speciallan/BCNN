@@ -10,6 +10,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from keras import optimizers
 from keras.applications.vgg16 import VGG16
+from keras.applications.densenet import DenseNet121
 from keras import backend as K
 from BCNN.models.xception import Xception
 
@@ -28,8 +29,8 @@ def l2_norm(x):
 
 def bilinear_cnn(size, class_num, attention_module=None):
     input_tensor = Input(shape=(size[0], size[1], 3))
-    model = Xception(include_top=False, weights=None,
-                        input_tensor=input_tensor, attention_module=attention_module)
+    model = Xception(input_tensor=input_tensor, include_top=False, weights=None)
+    # model = DenseNet121(input_tensor=input_tensor, include_top=False, weights='imagenet')
     cnn_out_a = model.layers[-2].output
     cnn_out_shape = model.layers[-2].output_shape
     cnn_out_a = Reshape([cnn_out_shape[1] * cnn_out_shape[2],
